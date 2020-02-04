@@ -103,10 +103,46 @@ class _Support extends MaterialPageRoute<Null> {
   _Support()
       : super(builder: (BuildContext context) {
          
+         const listTiles = <Widget>[
+            ListTile(
+              title: Text(
+                'Report a problem',
+                  style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              trailing: Icon(Icons.keyboard_arrow_right),
+              contentPadding: EdgeInsets.only(top: 10, left: 20, right: 20),
+            ),
+            Divider(),
+            ListTile(
+              title: Text(
+                'View reported problems',
+                  style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              trailing: Icon(Icons.keyboard_arrow_right),
+            ),
+            Divider(),
+            ListTile(
+              title: Text(
+                'FAQ',
+                  style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              trailing: Icon(Icons.keyboard_arrow_right),
+            ),
+            Divider(),
+
+         ];
+
           return Scaffold(
-            appBar: PreferredSize(
-              preferredSize: Size.fromHeight(50.0),
-              child: AppBar(
+            appBar: //PreferredSize(
+              //preferredSize: Size.fromHeight(54.0),
+              //child: 
+              AppBar(
               leading: new IconButton(
                icon: new Icon(Icons.keyboard_arrow_left, color: Colors.green, size: 40),
                onPressed: () => Navigator.of(context).pop(),
@@ -122,8 +158,10 @@ class _Support extends MaterialPageRoute<Null> {
               backgroundColor: Colors.grey[300],
               elevation: 1.0,
             ),
-          ),
+          //),
+          body: ListView(children: listTiles),
           
           );
+
         });
 }
