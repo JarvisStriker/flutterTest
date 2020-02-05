@@ -1,5 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'support.dart';
+import './models/problems.dart';
+
+
 
 void main() => runApp(MyApp());
 
@@ -103,7 +110,7 @@ class _Support extends MaterialPageRoute<Null> {
   _Support()
       : super(builder: (BuildContext context) {
          
-         const listTiles = <Widget>[
+         var listTiles = <Widget>[
             ListTile(
               title: Text(
                 'Report a problem',
@@ -112,9 +119,12 @@ class _Support extends MaterialPageRoute<Null> {
                 ),
               ),
               trailing: Icon(Icons.keyboard_arrow_right),
-              contentPadding: EdgeInsets.only(top: 10, left: 20, right: 20),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
+              onTap: (){
+                Navigator.push(context, _ReportProblem());
+              },
             ),
-            Divider(),
+            Divider(height: 1.0,),
             ListTile(
               title: Text(
                 'View reported problems',
@@ -123,8 +133,12 @@ class _Support extends MaterialPageRoute<Null> {
                 ),
               ),
               trailing: Icon(Icons.keyboard_arrow_right),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
+              onTap: (){
+                Navigator.push(context, _ReportedProblem());
+              },
             ),
-            Divider(),
+            Divider(height: 1.0,),
             ListTile(
               title: Text(
                 'FAQ',
@@ -133,8 +147,9 @@ class _Support extends MaterialPageRoute<Null> {
                 ),
               ),
               trailing: Icon(Icons.keyboard_arrow_right),
+              contentPadding: EdgeInsets.only(left: 20, right: 20),
             ),
-            Divider(),
+            Divider(height: 1.0,),
 
          ];
 
@@ -154,9 +169,8 @@ class _Support extends MaterialPageRoute<Null> {
                   color: Colors.black54,
                 ),
               ),
-              //leading: Icon(Icons.arrow_left),
               backgroundColor: Colors.grey[300],
-              elevation: 1.0,
+              elevation: 3.0,
             ),
           //),
           body: ListView(children: listTiles),
@@ -165,3 +179,221 @@ class _Support extends MaterialPageRoute<Null> {
 
         });
 }
+
+class _ReportedProblem extends MaterialPageRoute<Null> {
+  _ReportedProblem()
+      : super(builder: (BuildContext context) {
+         
+          return Scaffold(
+            appBar: //PreferredSize(
+              //preferredSize: Size.fromHeight(54.0),
+              //child: 
+              AppBar(
+              leading: new IconButton(
+               icon: new Icon(Icons.keyboard_arrow_left, color: Colors.green, size: 40),
+               onPressed: () => Navigator.of(context).pop(),
+              ),
+              centerTitle: true,
+              title: Text(
+                'Your reported problems',
+                style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              backgroundColor: Colors.grey[300],
+              elevation: 3.0,
+            ),
+          //),
+          body: ChatScreen(),
+          );
+
+        });
+}
+
+class ChatScreen extends StatefulWidget {
+  @override
+  ChatScreenState createState() {
+    return new ChatScreenState();
+  }
+}
+
+class ChatScreenState extends State<ChatScreen> {
+
+  Widget statusColour(String status){
+    MaterialColor _statusColour = Colors.red;
+    if(status == "RESOLVED")
+      _statusColour = Colors.green;
+    return new Text(
+      status,
+      style: new TextStyle(color: _statusColour, fontSize: 12.0)
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new ListView.builder(
+      itemCount: dummyData.length,
+      itemBuilder: (context, i) => new Column(
+            children: <Widget>[
+              
+              new ListTile(
+                contentPadding: EdgeInsets.only(left: 20, right: 20),
+                title: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      child: new Text(
+                        dummyData[i].problem,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                        //style: new TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    new Text(
+                      dummyData[i].date,
+                      style: new TextStyle(color: Colors.grey, fontSize: 14.0),
+                    ),
+                  ],
+                ),
+                subtitle: new Container(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: statusColour(dummyData[i].status),
+                ),
+              ),
+            new Divider(
+                height: 1.0,
+              ),
+            ],
+          ),
+    );
+  }
+}
+
+class _ReportProblem extends MaterialPageRoute<Null> {
+   _ReportProblem()
+      : super(builder: (BuildContext context) {
+         
+          return Scaffold(
+            appBar: //PreferredSize(
+              //preferredSize: Size.fromHeight(54.0),
+              //child: 
+              AppBar(
+              leading: new IconButton(
+               icon: new Icon(Icons.keyboard_arrow_left, color: Colors.green, size: 40),
+               onPressed: () => Navigator.of(context).pop(),
+              ),
+              centerTitle: true,
+              title: Text(
+                'Report a problem',
+                style: TextStyle(
+                  color: Colors.black54,
+                ),
+              ),
+              backgroundColor: Colors.grey[300],
+              elevation: 3.0,
+            ),
+          //),
+          body: ReportProblem(),
+          );
+
+        });
+}
+
+class ReportProblem extends StatefulWidget {
+  @override
+  ReportProblemState createState() {
+      return new ReportProblemState();
+    }
+  }
+  
+
+//implement  
+class ReportProblemState extends State<ReportProblem> {
+  
+  File _imageFile;
+
+  @override
+  Widget build (BuildContext context){
+      return Column(
+        children: <Widget>[
+          _BorderLessInput(context),
+          _ScreenshotAndCount(context),
+          Divider(height: 1.0),
+        ],
+      );
+      
+  }
+
+  final _controller = TextEditingController();
+  Color countColor = Colors.black54;
+
+  Widget _BorderLessInput (BuildContext context) {
+    return TextField(
+      controller: this._controller,
+      maxLines: 5,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.all(20),
+        //counterText: '${this._controller.text.length}/1000',
+        hintText: "Enter your message here...",
+        border: InputBorder.none,
+      ),
+      inputFormatters: [new LengthLimitingTextInputFormatter(1000),],
+      onChanged: (text) => setState(() {}),
+    );
+  }
+
+  Widget _ScreenshotAndCount (BuildContext context) {
+    if(this._controller.text.length == 1000)
+      countColor = Colors.red;
+    else
+      countColor = Colors.black54;
+    
+    return Row(children: <Widget>[
+
+      Padding(
+        padding: const EdgeInsets.only(left: 20, bottom: 10),
+        child: InkWell(
+          child: Container(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+              Text('ADD SCREENSHOT', 
+                style: TextStyle(
+                  fontSize: 10,
+                ),
+              ),
+              SizedBox(width: 5,),
+              Icon(Icons.photo, size: 18, color: Colors.green,),
+            ], ),
+          ),
+          onTap: () async => await _pickImage(),
+        ),
+      ),
+
+      Expanded(child: SizedBox(width: 10),),
+      Padding(
+        padding: const EdgeInsets.only(left: 20, bottom: 10, right: 20),
+        child: Text(
+          '${this._controller.text.length}/1000',
+          style: TextStyle(
+            color: countColor,
+          ),
+        ),
+      ),            
+    ],);
+  }
+
+  Future<Null> _pickImage() async {
+    final File imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      this._imageFile = imageFile;
+    });
+  }
+}
+
+
+
+
+
+   
